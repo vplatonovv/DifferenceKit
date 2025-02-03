@@ -19,6 +19,7 @@ public extension UITableView {
         using stagedChangeset: StagedChangeset<C>,
         with animation: @autoclosure () -> RowAnimation,
         interrupt: ((Changeset<C>) -> Bool)? = nil,
+        completion: ((Bool) -> Void)?,
         setData: (C) -> Void
         ) {
         reload(
@@ -30,6 +31,7 @@ public extension UITableView {
             insertRowsAnimation: animation(),
             reloadRowsAnimation: animation(),
             interrupt: interrupt,
+            completion: completion,
             setData: setData
         )
     }
@@ -61,6 +63,7 @@ public extension UITableView {
         insertRowsAnimation: @autoclosure () -> RowAnimation,
         reloadRowsAnimation: @autoclosure () -> RowAnimation,
         interrupt: ((Changeset<C>) -> Bool)? = nil,
+        completion: ((Bool) -> Void)?,
         setData: (C) -> Void
         ) {
         if case .none = window, let data = stagedChangeset.last?.data {
@@ -108,13 +111,15 @@ public extension UITableView {
                 for (source, target) in changeset.elementMoved {
                     moveRow(at: IndexPath(row: source.element, section: source.section), to: IndexPath(row: target.element, section: target.section))
                 }
+            } completion: { finished in
+                completion?(finished)
             }
         }
     }
 
-    private func _performBatchUpdates(_ updates: () -> Void) {
+    private func _performBatchUpdates(_ updates: () -> Void, completion: ((Bool) -> Void)?) {
         if #available(iOS 11.0, tvOS 11.0, *) {
-            performBatchUpdates(updates)
+            performBatchUpdates(updates, completion: completion)
         }
         else {
             beginUpdates()
