@@ -69,7 +69,7 @@ public extension UITableView {
     ) {
         if case .none = window, let data = stagedChangeset.last?.data {
             setData(data)
-            guard !hasUncommittedUpdates else { return }
+            if hasUncommittedUpdates == true { return }
             return reloadData()
         }
         
@@ -77,7 +77,7 @@ public extension UITableView {
             for changeset in stagedChangeset {
                 if let interrupt = interrupt, interrupt(changeset), let data = stagedChangeset.last?.data {
                     setData(data)
-                    guard !hasUncommittedUpdates else { return }
+                    if hasUncommittedUpdates == true { return }
                     return reloadData()
                 }
                 
