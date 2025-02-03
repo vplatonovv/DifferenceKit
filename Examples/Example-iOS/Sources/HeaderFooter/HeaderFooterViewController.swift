@@ -10,9 +10,12 @@ final class HeaderFooterViewController: UITableViewController {
         get { return data }
         set {
             let changeset = StagedChangeset(source: data, target: newValue)
-            tableView.reload(using: changeset, with: .fade) { data in
+            tableView.reload(using: changeset, with: .fade) { finished in
+                print(finished)
+            } setData: { data in
                 self.data = data
             }
+
         }
     }
 
