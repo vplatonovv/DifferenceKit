@@ -1,6 +1,7 @@
 #if os(iOS) || os(tvOS)
 import UIKit
 
+@available(iOS 11.0, tvOS 11.0, *)
 public extension UITableView {
     /// Applies multiple animated updates in stages using `StagedChangeset`.
     ///
@@ -68,6 +69,7 @@ public extension UITableView {
     ) {
         if case .none = window, let data = stagedChangeset.last?.data {
             setData(data)
+            guard !hasUncommittedUpdates else { return }
             return reloadData()
         }
         
@@ -75,6 +77,7 @@ public extension UITableView {
             for changeset in stagedChangeset {
                 if let interrupt = interrupt, interrupt(changeset), let data = stagedChangeset.last?.data {
                     setData(data)
+                    guard !hasUncommittedUpdates else { return }
                     return reloadData()
                 }
                 
