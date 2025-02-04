@@ -69,17 +69,15 @@ public extension UITableView {
     ) {
         if case .none = window, let data = stagedChangeset.last?.data {
             setData(data)
-            if hasUncommittedUpdates == true { return }
             return reloadData()
         }
         
         _performBatchUpdates {
             for changeset in stagedChangeset {
-                if let interrupt = interrupt, interrupt(changeset), let data = stagedChangeset.last?.data {
-                    setData(data)
-                    if hasUncommittedUpdates == true { return }
-                    return reloadData()
-                }
+//                if let interrupt = interrupt, interrupt(changeset), let data = stagedChangeset.last?.data {
+//                    setData(data)
+//                    return
+//                }
                 
                 setData(changeset.data)
                 
@@ -121,14 +119,7 @@ public extension UITableView {
     }
 
     private func _performBatchUpdates(_ updates: () -> Void, completion: ((Bool) -> Void)?) {
-        if #available(iOS 11.0, tvOS 11.0, *) {
-            performBatchUpdates(updates, completion: completion)
-        }
-        else {
-            beginUpdates()
-            updates()
-            endUpdates()
-        }
+        performBatchUpdates(updates, completion: completion)
     }
 }
 
