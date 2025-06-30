@@ -70,12 +70,12 @@ public extension UITableView {
             setData(data)
             return reloadData()
         }
-        if let interrupt, let changeset = stagedChangeset.last, interrupt(changeset) {
-            setData(changeset.data)
-            return reloadData()
-        }
         
-        for changeset in stagedChangeset {
+        for (index, changeset) in stagedChangeset.enumerated() {
+            if let interrupt = interrupt, interrupt(changeset), let data = stagedChangeset.last?.data {
+                setData(data)
+                return reloadData()
+            }
             _performBatchUpdates {
                 setData(changeset.data)
                 if !changeset.sectionDeleted.isEmpty {
@@ -103,7 +103,11 @@ public extension UITableView {
                     moveRow(at: IndexPath(row: source.element, section: source.section), to: IndexPath(row: target.element, section: target.section))
                 }
             } completion: { bool in
-                completion?(bool)
+                // code for avoid multiple completion calling
+                // so we call completion for last changeset only
+                if index == stagedChangeset.count - 1 {
+                    completion?(bool)
+                }
             }
         }
     }
