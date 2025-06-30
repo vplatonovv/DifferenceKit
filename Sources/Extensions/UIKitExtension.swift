@@ -74,8 +74,9 @@ public extension UITableView {
             setData(changeset.data)
             return reloadData()
         }
-        _performBatchUpdates {
-            for changeset in stagedChangeset {
+        
+        for changeset in stagedChangeset {
+            _performBatchUpdates {
                 setData(changeset.data)
                 if !changeset.sectionDeleted.isEmpty {
                     deleteSections(IndexSet(changeset.sectionDeleted), with: deleteSectionsAnimation())
@@ -101,9 +102,9 @@ public extension UITableView {
                 for (source, target) in changeset.elementMoved {
                     moveRow(at: IndexPath(row: source.element, section: source.section), to: IndexPath(row: target.element, section: target.section))
                 }
+            } completion: { bool in
+                completion?(bool)
             }
-        } completion: { bool in
-            completion?(bool)
         }
     }
 
